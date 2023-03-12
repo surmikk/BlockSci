@@ -52,8 +52,8 @@ namespace blocksci { namespace heuristics {
      * Note: This heuristic depends on the outputs being spent to detect change.
      */
     ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::SpendingBeforeAgeN>::operator()(const Transaction &tx) const {
-
-        return tx.outputs() | ranges::views::filter([digits](Output o){return o.isSpent() && o.getSpendingInput().age() <= digits;}) | ranges::views::filter(filterOpReturn);
+        auto maxAge = digits;
+        return tx.outputs() | ranges::views::filter([maxAge](Output o){return o.isSpent() && o.getSpendingInput().age() <= maxAge;}) | ranges::views::filter(filterOpReturn);
     }
 
     /** If address is used in single UTXO, it's likely change address. */
@@ -67,15 +67,15 @@ namespace blocksci { namespace heuristics {
         if (tx.outputCount() < digits) {
             return ranges::views::empty<Output>;
         }
-        else {
-            return tx.outputs() | ranges::views::filter(filterOpReturn);
-        }
+
+        return tx.outputs() | ranges::views::filter(filterOpReturn);
     }
 
     /** If transaction outputs has more than N outputs, they are probably a change addresses. */
     ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::SpendingAtLeastNOutputs>::operator()(const Transaction &tx) const {
+        auto minOutputs = digits;
 
-        return tx.outputs() | ranges::views::filter([digits](Output o){return o.isSpent() && o.getSpendingTx().outputCount() >= digits;}) | ranges::views::filter(filterOpReturn);
+        return tx.outputs() | ranges::views::filter([minOutputs](Output o){return o.isSpent() && o.getSpendingTx().outputCount() >= minOutputs;}) | ranges::views::filter(filterOpReturn);
     }
 
 
