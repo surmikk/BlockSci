@@ -20,8 +20,8 @@
 
 #include <unordered_set>
 
-#define CHANGE_ADDRESS_TYPE_LIST VAL(PeelingChain), VAL(PowerOfTen), VAL(OptimalChange), VAL(AddressType), VAL(Locktime), VAL(AddressReuse), VAL(ClientChangeAddressBehavior), VAL(Legacy), VAL(FixedFee), VAL(None), VAL(Spent)
-#define CHANGE_ADDRESS_TYPE_SET VAL(PeelingChain), VAL(PowerOfTen), VAL(OptimalChange), VAL(AddressType) VAL(Locktime), VAL(AddressReuse), VAL(ClientChangeAddressBehavior), VAL(Legacy), VAL(FixedFee), VAL(None), VAL(Spent)
+#define CHANGE_ADDRESS_TYPE_LIST VAL(PeelingChain), VAL(PowerOfTen), VAL(OptimalChange), VAL(AddressType), VAL(Locktime), VAL(AddressReuse), VAL(ClientChangeAddressBehavior), VAL(Legacy), VAL(FixedFee), VAL(None), VAL(Spent), VAL(SpendingBeforeAgeN), VAL(OneTime), VAL(AtLeastNOutputs), VAL(SpendingAtLeastNOutputs)
+#define CHANGE_ADDRESS_TYPE_SET VAL(PeelingChain), VAL(PowerOfTen), VAL(OptimalChange), VAL(AddressType) VAL(Locktime), VAL(AddressReuse), VAL(ClientChangeAddressBehavior), VAL(Legacy), VAL(FixedFee), VAL(None), VAL(Spent), VAL(SpendingBeforeAgeN), VAL(OneTime), VAL(AtLeastNOutputs), VAL(SpendingAtLeastNOutputs)
 namespace blocksci {
 namespace heuristics {
     
@@ -50,8 +50,33 @@ namespace heuristics {
         ChangeHeuristicImpl(int digits_ = 6) : digits(digits_) {}
         ranges::any_view<Output> operator()(const Transaction &tx) const;
     };
+
+    template<>
+    struct BLOCKSCI_EXPORT ChangeHeuristicImpl<ChangeType::SpendingBeforeAgeN> {
+        int digits;
+        ChangeHeuristicImpl(int digits_ = 6) : digits(digits_) {}
+        ranges::any_view<Output> operator()(const Transaction &tx) const;
+    };
     
+    template<>
+    struct BLOCKSCI_EXPORT ChangeHeuristicImpl<ChangeType::AtLeastNOutputs> {
+        int digits;
+        ChangeHeuristicImpl(int digits_ = 3) : digits(digits_) {}
+        ranges::any_view<Output> operator()(const Transaction &tx) const;
+    };
+
+    template<>
+    struct BLOCKSCI_EXPORT ChangeHeuristicImpl<ChangeType::SpendingAtLeastNOutputs> {
+        int digits;
+        ChangeHeuristicImpl(int digits_ = 3) : digits(digits_) {}
+        ranges::any_view<Output> operator()(const Transaction &tx) const;
+    };
+
     using PeelingChainChange = ChangeHeuristicImpl<ChangeType::PeelingChain>;
+    using SpendingBeforeAgeNChange =  ChangeHeuristicImpl<ChangeType::SpendingBeforeAgeN>;
+    using OneTimeChange =  ChangeHeuristicImpl<ChangeType::OneTime>;
+    using AtLeastNOutputsChange =  ChangeHeuristicImpl<ChangeType::AtLeastNOutputs>;
+    using SpendingAtLeastNOutputsChange =  ChangeHeuristicImpl<ChangeType::SpendingAtLeastNOutputs>;
     using PowerOfTenChange = ChangeHeuristicImpl<ChangeType::PowerOfTen>;
     using OptimalChangeChange = ChangeHeuristicImpl<ChangeType::OptimalChange>;
     using AddressTypeChange = ChangeHeuristicImpl<ChangeType::AddressType>;

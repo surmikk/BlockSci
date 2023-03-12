@@ -95,6 +95,18 @@ void init_heuristics(py::module &m) {
     .def_static("power_of_ten_value", [](int digits) { return ChangeHeuristic{PowerOfTenChange{digits}}; }, py::arg("digits") = 6,
         "Return a ChangeHeuristic object implementing the power of ten value heuristic: Detects possible change outputs by checking for output values that are multiples of 10^digits.")
     
+    .def_static("spending_before_age_n", [](int digits) { return ChangeHeuristic{SpendingBeforeAgeNChange{digits}}; }, py::arg("digits") = 6,
+        "Return a ChangeHeuristic object implementing the spending before age n heuristic: Detects possible change outputs by checking for outputs which are spend before age of n blocks.")
+    
+    .def_static("one_time", [](pybind11::object &) { return ChangeHeuristic{OneTimeChange{}}; },
+        "Return a ChangeHeuristic object implementing the one time change heuristic: Detects possible change outputs by checking for one time changes.")
+    
+    .def_static("at_least_n_outputs", [](int digits) { return ChangeHeuristic{AtLeastNOutputsChange{digits}}; }, py::arg("digits") = 3,
+        "Return a ChangeHeuristic object implementing the at least n outputs heuristic: Detects possible change outputs by checking if current transaction has at least n outputs.")
+    
+    .def_static("spending_at_least_n_outputs", [](int digits) { return ChangeHeuristic{SpendingAtLeastNOutputsChange{digits}}; }, py::arg("digits") = 3,
+        "Return a ChangeHeuristic object implementing the spending at least n outputs heuristic: Detects possible change outputs by checking for output which are spend in txes having at least n outputs.")
+    
     .def_property_readonly_static("optimal_change", [](pybind11::object &) { return ChangeHeuristic{OptimalChangeChange{}}; },
         "Return a ChangeHeuristic object implementing the optimal change heuristic: If there exists an output that is smaller than any of the inputs it is likely the change. If a change output was larger than the smallest input, then the coin selection algorithm wouldn't need to add the input in the first place.")
     

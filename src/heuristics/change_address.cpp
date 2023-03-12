@@ -47,6 +47,38 @@ namespace blocksci { namespace heuristics {
         return tx.outputs() | ranges::views::filter([](Output o){return !o.isSpent() || isPeelingChain(*o.getSpendingTx());}) | ranges::views::filter(filterOpReturn);
     }
 
+    /** When somebody spends UTXO's that are less then N blocks old, it's probably the same entity which created this UTXO
+     *
+     * Note: This heuristic depends on the outputs being spent to detect change.
+     */
+    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::SpendingBeforeAgeN>::operator()(const Transaction &tx) const {
+
+        return tx.outputs() | ranges::views::filter([digits](Output o){return o.isSpent() && o.getSpendingInput().age() <= digits;}) | ranges::views::filter(filterOpReturn);
+    }
+
+    /** If address is used in single UTXO, it's likely change address. */
+    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::OneTime>::operator()(const Transaction &tx) const {
+
+        return tx.outputs() | ranges::views::filter([](Output o){return o.getAddress().getOutputTransactions().size() <= 1;}) | ranges::views::filter(filterOpReturn);
+    }
+
+    /** If transaction has less than N outputs, there is probably not a change. */
+    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::AtLeastNOutputs>::operator()(const Transaction &tx) const {
+        if (tx.outputCount() < digits) {
+            return ranges::views::empty<Output>;
+        }
+        else {
+            return tx.outputs() | ranges::views::filter(filterOpReturn);
+        }
+    }
+
+    /** If transaction outputs has more than N outputs, they are probably a change addresses. */
+    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::SpendingAtLeastNOutputs>::operator()(const Transaction &tx) const {
+
+        return tx.outputs() | ranges::views::filter([digits](Output o){return o.isSpent() && o.getSpendingTx().outputCount() >= digits;}) | ranges::views::filter(filterOpReturn);
+    }
+
+
     /** Returns 10^{digits} */
     int64_t int_pow_ten(int digits) {
         if (digits < 16) {
