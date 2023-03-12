@@ -53,22 +53,22 @@ namespace heuristics {
 
     template<>
     struct BLOCKSCI_EXPORT ChangeHeuristicImpl<ChangeType::SpendingBeforeAgeN> {
-        int digits;
-        ChangeHeuristicImpl(int digits_ = 6) : digits(digits_) {}
+        int maxAge;
+        ChangeHeuristicImpl(int maxAge_ = 6) : maxAge(maxAge_) {}
         ranges::any_view<Output> operator()(const Transaction &tx) const;
     };
     
     template<>
     struct BLOCKSCI_EXPORT ChangeHeuristicImpl<ChangeType::AtLeastNOutputs> {
-        int digits;
-        ChangeHeuristicImpl(int digits_ = 3) : digits(digits_) {}
+        int maxOutputs;
+        ChangeHeuristicImpl(int maxOutputs_ = 3) : maxOutputs(maxOutputs_) {}
         ranges::any_view<Output> operator()(const Transaction &tx) const;
     };
 
     template<>
     struct BLOCKSCI_EXPORT ChangeHeuristicImpl<ChangeType::SpendingAtLeastNOutputs> {
-        int digits;
-        ChangeHeuristicImpl(int digits_ = 3) : digits(digits_) {}
+        int maxSpendingOutputs;
+        ChangeHeuristicImpl(int maxSpendingOutputs_ = 3) : maxSpendingOutputs(maxSpendingOutputs_) {}
         ranges::any_view<Output> operator()(const Transaction &tx) const;
     };
 
