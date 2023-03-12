@@ -20,8 +20,8 @@
 
 #include <unordered_set>
 
-#define CHANGE_ADDRESS_TYPE_LIST VAL(PeelingChain), VAL(PowerOfTen), VAL(OptimalChange), VAL(AddressType), VAL(Locktime), VAL(AddressReuse), VAL(ClientChangeAddressBehavior), VAL(Legacy), VAL(FixedFee), VAL(None), VAL(Spent), VAL(SpendingBeforeAgeN), VAL(OneTime), VAL(AtLeastNOutputs), VAL(SpendingAtLeastNOutputs)
-#define CHANGE_ADDRESS_TYPE_SET VAL(PeelingChain), VAL(PowerOfTen), VAL(OptimalChange), VAL(AddressType) VAL(Locktime), VAL(AddressReuse), VAL(ClientChangeAddressBehavior), VAL(Legacy), VAL(FixedFee), VAL(None), VAL(Spent), VAL(SpendingBeforeAgeN), VAL(OneTime), VAL(AtLeastNOutputs), VAL(SpendingAtLeastNOutputs)
+#define CHANGE_ADDRESS_TYPE_LIST VAL(PeelingChain), VAL(PowerOfTen), VAL(OptimalChange), VAL(AddressType), VAL(Locktime), VAL(AddressReuse), VAL(ClientChangeAddressBehavior), VAL(Legacy), VAL(FixedFee), VAL(None), VAL(Spent), VAL(SpendingBeforeAge3), VAL(OneTime), VAL(AtLeast6Outputs), VAL(SpendingAtLeast6Outputs)
+#define CHANGE_ADDRESS_TYPE_SET VAL(PeelingChain), VAL(PowerOfTen), VAL(OptimalChange), VAL(AddressType) VAL(Locktime), VAL(AddressReuse), VAL(ClientChangeAddressBehavior), VAL(Legacy), VAL(FixedFee), VAL(None), VAL(Spent), VAL(SpendingBeforeAge3), VAL(OneTime), VAL(AtLeast6Outputs), VAL(SpendingAtLeast6Outputs)
 namespace blocksci {
 namespace heuristics {
     
@@ -51,7 +51,7 @@ namespace heuristics {
         ranges::any_view<Output> operator()(const Transaction &tx) const;
     };
 
-    template<>
+    /*template<>
     struct BLOCKSCI_EXPORT ChangeHeuristicImpl<ChangeType::SpendingBeforeAgeN> {
         int maxAge;
         ChangeHeuristicImpl(int maxAge_ = 6) : maxAge(maxAge_) {}
@@ -70,13 +70,13 @@ namespace heuristics {
         int maxSpendingOutputs;
         ChangeHeuristicImpl(int maxSpendingOutputs_ = 3) : maxSpendingOutputs(maxSpendingOutputs_) {}
         ranges::any_view<Output> operator()(const Transaction &tx) const;
-    };
+    };*/
 
     using PeelingChainChange = ChangeHeuristicImpl<ChangeType::PeelingChain>;
-    using SpendingBeforeAgeNChange =  ChangeHeuristicImpl<ChangeType::SpendingBeforeAgeN>;
+    using SpendingBeforeAge6Change =  ChangeHeuristicImpl<ChangeType::SpendingBeforeAge6>;
     using OneTimeChange =  ChangeHeuristicImpl<ChangeType::OneTime>;
-    using AtLeastNOutputsChange =  ChangeHeuristicImpl<ChangeType::AtLeastNOutputs>;
-    using SpendingAtLeastNOutputsChange =  ChangeHeuristicImpl<ChangeType::SpendingAtLeastNOutputs>;
+    using AtLeast3OutputsChange =  ChangeHeuristicImpl<ChangeType::AtLeast3Outputs>;
+    using SpendingAtLeast3OutputsChange =  ChangeHeuristicImpl<ChangeType::SpendingAtLeast3Outputs>;
     using PowerOfTenChange = ChangeHeuristicImpl<ChangeType::PowerOfTen>;
     using OptimalChangeChange = ChangeHeuristicImpl<ChangeType::OptimalChange>;
     using AddressTypeChange = ChangeHeuristicImpl<ChangeType::AddressType>;

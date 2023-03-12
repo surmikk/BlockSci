@@ -51,9 +51,10 @@ namespace blocksci { namespace heuristics {
      *
      * Note: This heuristic depends on the outputs being spent to detect change.
      */
-    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::SpendingBeforeAgeN>::operator()(const Transaction &tx) const {
-        int64_t myMaxAge = maxAge;
-        return tx.outputs() | ranges::views::filter([myMaxAge](Output o){return o.isSpent() && o.getSpendingInput().age() <= myMaxAge;}) | ranges::views::filter(filterOpReturn);
+    template<>
+    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::SpendingBeforeAge6>::operator()(const Transaction &tx) const {
+        
+        return tx.outputs() | ranges::views::filter([](Output o){return o.isSpent() && o.getSpendingInput().age() <= 6;}) | ranges::views::filter(filterOpReturn);
     }
 
     /** If address is used in single UTXO, it's likely change address. */
@@ -64,9 +65,9 @@ namespace blocksci { namespace heuristics {
     }
 
     /** If transaction has less than N outputs, there is probably not a change. */
-    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::AtLeastNOutputs>::operator()(const Transaction &tx) const {
-        int64_t myMaxOutputs = maxOutputs;
-        if (tx.outputCount() < myMaxOutputs) {
+    template<>
+    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::AtLeast3Outputs>::operator()(const Transaction &tx) const {
+        if (tx.outputCount() < 3) {
             return ranges::views::empty<Output>;
         }
 
@@ -74,10 +75,10 @@ namespace blocksci { namespace heuristics {
     }
 
     /** If transaction outputs has more than N outputs, they are probably a change addresses. */
-    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::SpendingAtLeastNOutputs>::operator()(const Transaction &tx) const {
-        int64_t myMaxSpendingOutputs = maxSpendingOutputs;
+    template<>
+    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::SpendingAtLeast3Outputs>::operator()(const Transaction &tx) const {
 
-        return tx.outputs() | ranges::views::filter([myMaxSpendingOutputs](Output o){return o.isSpent() && o.getSpendingTx().outputCount() >= myMaxSpendingOutputs;}) | ranges::views::filter(filterOpReturn);
+        return tx.outputs() | ranges::views::filter([](Output o){return o.isSpent() && o.getSpendingTx().outputCount() >= 3;}) | ranges::views::filter(filterOpReturn);
     }
 
 
