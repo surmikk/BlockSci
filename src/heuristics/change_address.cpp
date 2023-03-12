@@ -30,6 +30,16 @@ namespace blocksci { namespace heuristics {
     bool filterOpReturn(Output o) {
         return o.getAddress().isSpendable();
     }
+
+    /** When somebody spends UTXO's that are less then N blocks old, it's probably the same entity which created this UTXO
+     *
+     * Note: This heuristic depends on the outputs being spent to detect change.
+     */
+    template<>
+    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::EarlySpent>::operator()(const Transaction &tx) const {
+
+        return tx.outputs() | ranges::views::filter([](Output o){return o.isSpent() && o.getSpendingInput().age() <= 6;}) | ranges::views::filter(filterOpReturn);
+    }
     
     /** In a peeling chain, the change output is the output that continues the chain
      *

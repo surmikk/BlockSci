@@ -20,8 +20,8 @@
 
 #include <unordered_set>
 
-#define CHANGE_ADDRESS_TYPE_LIST VAL(PeelingChain), VAL(PowerOfTen), VAL(OptimalChange), VAL(AddressType), VAL(Locktime), VAL(AddressReuse), VAL(ClientChangeAddressBehavior), VAL(Legacy), VAL(FixedFee), VAL(None), VAL(Spent)
-#define CHANGE_ADDRESS_TYPE_SET VAL(PeelingChain), VAL(PowerOfTen), VAL(OptimalChange), VAL(AddressType) VAL(Locktime), VAL(AddressReuse), VAL(ClientChangeAddressBehavior), VAL(Legacy), VAL(FixedFee), VAL(None), VAL(Spent)
+#define CHANGE_ADDRESS_TYPE_LIST VAL(EarlySpent), VAL(PeelingChain), VAL(PowerOfTen), VAL(OptimalChange), VAL(AddressType), VAL(Locktime), VAL(AddressReuse), VAL(ClientChangeAddressBehavior), VAL(Legacy), VAL(FixedFee), VAL(None), VAL(Spent)
+#define CHANGE_ADDRESS_TYPE_SET VAL(EarlySpent), VAL(PeelingChain), VAL(PowerOfTen), VAL(OptimalChange), VAL(AddressType) VAL(Locktime), VAL(AddressReuse), VAL(ClientChangeAddressBehavior), VAL(Legacy), VAL(FixedFee), VAL(None), VAL(Spent)
 namespace blocksci {
 namespace heuristics {
     
@@ -51,6 +51,7 @@ namespace heuristics {
         ranges::any_view<Output> operator()(const Transaction &tx) const;
     };
     
+    using EarlySpentChange = ChangeHeuristicImpl<ChangeType::EarlySpent>;
     using PeelingChainChange = ChangeHeuristicImpl<ChangeType::PeelingChain>;
     using PowerOfTenChange = ChangeHeuristicImpl<ChangeType::PowerOfTen>;
     using OptimalChangeChange = ChangeHeuristicImpl<ChangeType::OptimalChange>;
