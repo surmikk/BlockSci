@@ -57,6 +57,7 @@ namespace blocksci { namespace heuristics {
     }
 
     /** If address is used in single UTXO, it's likely change address. */
+    template<>
     ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::OneTime>::operator()(const Transaction &tx) const {
 
         return tx.outputs() | ranges::views::filter([](Output o){return o.getAddress().getOutputTransactions().size() <= 1;}) | ranges::views::filter(filterOpReturn);
