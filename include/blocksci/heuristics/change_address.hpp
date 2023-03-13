@@ -34,7 +34,7 @@ namespace heuristics {
         #undef VAL
         };
         #define VAL(x) Enum::x
-        static constexpr std::array<Enum, 12> all = {{CHANGE_ADDRESS_TYPE_LIST}};
+        static constexpr std::array<Enum, 13> all = {{CHANGE_ADDRESS_TYPE_LIST}};
         #undef VAL
         static constexpr size_t size = all.size();
     };
@@ -50,7 +50,16 @@ namespace heuristics {
         ChangeHeuristicImpl(int digits_ = 6) : digits(digits_) {}
         ranges::any_view<Output> operator()(const Transaction &tx) const;
     };
+
+    template<>
+    struct BLOCKSCI_EXPORT ChangeHeuristicImpl<ChangeType::SpendingBeforeAgeN> {
+        int maxAge;
+        ChangeHeuristicImpl(int maxAge_ = 6) : maxAge(maxAge_) {}
+        ranges::any_view<Output> operator()(const Transaction &tx) const;
+    };
     
+    using EarlySpentChange = ChangeHeuristicImpl<ChangeType::EarlySpent>;
+    using SpendingBeforeAgeNChange = ChangeHeuristicImpl<ChangeType::SpendingBeforeAgeN>;
     using EarlySpentChange = ChangeHeuristicImpl<ChangeType::EarlySpent>;
     using PeelingChainChange = ChangeHeuristicImpl<ChangeType::PeelingChain>;
     using PowerOfTenChange = ChangeHeuristicImpl<ChangeType::PowerOfTen>;

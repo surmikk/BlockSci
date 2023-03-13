@@ -101,6 +101,9 @@ void init_heuristics(py::module &m) {
     .def_property_readonly_static("early_spent", [](pybind11::object &) { return ChangeHeuristic{EarlySpentChange{}}; },
         "Return a ChangeHeuristic object implementing the early spent change heuristic: If output is spent before age of 6 blocks, then it's the change.")
     
+    .def_static("spending_before_age_n", [](int maxAge) { return ChangeHeuristic{SpendingBeforeAgeNChange{maxAge}}; }, py::arg("max_age") = 6,
+        "Return a ChangeHeuristic object implementing the spending before age n heuristic: Detects possible change outputs by checking for outputs which are spend before age of n blocks.")
+    
     .def_property_readonly_static("address_type", [](pybind11::object &) { return ChangeHeuristic{AddressTypeChange{}}; },
         "Return a ChangeHeuristic object implementing the address type heuristic: If all inputs are of one address type (e.g., P2PKH or P2SH), it is likely that the change output has the same type.")
 

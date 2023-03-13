@@ -40,6 +40,16 @@ namespace blocksci { namespace heuristics {
         return tx.outputs() | ranges::views::filter([](Output o){return o.isSpent() && o.getSpendingInput()->age() <= 6;}) | ranges::views::filter(filterOpReturn);
     }
 
+
+    /** When somebody spends UTXO's that are less then N blocks old, it's probably the same entity which created this UTXO
+     *
+     * Note: This heuristic depends on the outputs being spent to detect change.
+     */
+    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::SpendingBeforeAgeN>::operator()(const Transaction &tx) const {
+        int64_t myMaxAge = maxAge;
+        return tx.outputs() | ranges::views::filter([myMaxAge](Output o){return o.isSpent() && o.getSpendingInput()->age() <= myMaxAge;}) | ranges::views::filter(filterOpReturn);
+    }
+
     /** In a peeling chain, the change output is the output that continues the chain
      *
      * Note: This heuristic depends on the outputs being spent to detect change.
