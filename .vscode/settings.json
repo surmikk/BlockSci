@@ -15,6 +15,7 @@
         "concepts": "cpp",
         "functional": "cpp",
         "memory": "cpp",
-        "xmemory": "cpp"
+        "xmemory": "cpp",
+        "unordered_map": "cpp"
     }
 }
