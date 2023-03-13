@@ -54,7 +54,7 @@ namespace blocksci { namespace heuristics {
     template<>
     ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::SpendingBeforeAge6>::operator()(const Transaction &tx) const {
         
-        return tx.outputs() | ranges::views::filter([](Output o){return o.isSpent() && o.getSpendingInput().age() <= 6;}) | ranges::views::filter(filterOpReturn);
+        return tx.outputs() | ranges::views::filter([](Output o){return o.isSpent() && o.getSpendingInput()->age() <= 6;}) | ranges::views::filter(filterOpReturn);
     }
 
     /** If address is used in single UTXO, it's likely change address. */
@@ -78,7 +78,7 @@ namespace blocksci { namespace heuristics {
     template<>
     ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::SpendingAtLeast3Outputs>::operator()(const Transaction &tx) const {
 
-        return tx.outputs() | ranges::views::filter([](Output o){return o.isSpent() && o.getSpendingTx().outputCount() >= 3;}) | ranges::views::filter(filterOpReturn);
+        return tx.outputs() | ranges::views::filter([](Output o){return o.isSpent() && o.getSpendingTx()->outputCount() >= 3;}) | ranges::views::filter(filterOpReturn);
     }
 
 
