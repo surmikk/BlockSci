@@ -50,6 +50,18 @@ namespace blocksci { namespace heuristics {
         return tx.outputs() | ranges::views::filter([myMaxAge](Output o){return o.isSpent() && o.getSpendingInput()->age() <= myMaxAge;}) | ranges::views::filter(filterOpReturn);
     }
 
+
+    /** If transaction has less than N outputs, there is probably not a change. */
+    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::AtLeastNOutputs>::operator()(const Transaction &tx) const {
+        int64_t myMaxOutputs = maxOutputs;
+        if (tx.outputCount() < myMaxOutputs) {
+            return ranges::views::empty<Output>;
+        }
+        return tx.outputs() | ranges::views::filter(filterOpReturn);
+    }
+
+    
+
     /** In a peeling chain, the change output is the output that continues the chain
      *
      * Note: This heuristic depends on the outputs being spent to detect change.
