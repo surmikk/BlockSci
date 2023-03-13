@@ -60,7 +60,12 @@ namespace blocksci { namespace heuristics {
         return tx.outputs() | ranges::views::filter(filterOpReturn);
     }
 
-    
+    /** If transaction outputs has more than N outputs, they are probably a change addresses. */
+    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::SpendingAtLeastNOutputs>::operator()(const Transaction &tx) const {
+        int64_t myMaxSpendingOutputs = maxSpendingOutputs;
+        return tx.outputs() | ranges::views::filter([myMaxSpendingOutputs](Output o){return o.isSpent() && o.getSpendingTx()->outputCount() >= myMaxSpendingOutputs;}) | ranges::views::filter(filterOpReturn);
+    }
+
 
     /** In a peeling chain, the change output is the output that continues the chain
      *
