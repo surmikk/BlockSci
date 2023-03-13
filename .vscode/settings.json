@@ -1,0 +1,20 @@
+{
+    "files.associations": {
+        "limits": "cpp",
+        "array": "cpp",
+        "bitset": "cpp",
+        "initializer_list": "cpp",
+        "list": "cpp",
+        "type_traits": "cpp",
+        "vector": "cpp",
+        "xhash": "cpp",
+        "xstring": "cpp",
+        "xtree": "cpp",
+        "xutility": "cpp",
+        "algorithm": "cpp",
+        "concepts": "cpp",
+        "functional": "cpp",
+        "memory": "cpp",
+        "xmemory": "cpp"
+    }
+}

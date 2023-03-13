@@ -22,6 +22,7 @@
 
 #define CHANGE_ADDRESS_TYPE_LIST VAL(OneTime), VAL(SpendingAtLeastNOutputs), VAL(AtLeastNOutputs), VAL(SpendingBeforeAgeN), VAL(PeelingChain), VAL(PowerOfTen), VAL(OptimalChange), VAL(AddressType), VAL(Locktime), VAL(AddressReuse), VAL(ClientChangeAddressBehavior), VAL(Legacy), VAL(FixedFee), VAL(None), VAL(Spent)
 #define CHANGE_ADDRESS_TYPE_SET VAL(OneTime), VAL(SpendingAtLeastNOutputs), VAL(AtLeastNOutputs), VAL(SpendingBeforeAgeN), VAL(PeelingChain), VAL(PowerOfTen), VAL(OptimalChange), VAL(AddressType) VAL(Locktime), VAL(AddressReuse), VAL(ClientChangeAddressBehavior), VAL(Legacy), VAL(FixedFee), VAL(None), VAL(Spent)
+
 namespace blocksci {
 namespace heuristics {
     
@@ -64,7 +65,7 @@ namespace heuristics {
         ChangeHeuristicImpl(int maxOutputs_ = 3) : maxOutputs(maxOutputs_) {}
         ranges::any_view<Output> operator()(const Transaction &tx) const;
     };
-    
+
     template<>
     struct BLOCKSCI_EXPORT ChangeHeuristicImpl<ChangeType::SpendingAtLeastNOutputs> {
         int maxSpendingOutputs;

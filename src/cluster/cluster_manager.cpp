@@ -132,6 +132,7 @@ namespace blocksci {
         }
     };
     
+    // here IS M-I heuristic
     template <typename ChangeFunc>
     std::vector<std::pair<Address, Address>> processTransaction(const Transaction &tx, ChangeFunc && changeHeuristic,
                                                                 bool ignoreCoinJoin) {
@@ -164,6 +165,7 @@ namespace blocksci {
         });
     }
     
+    // GENERAL CLUSTERING process
     template <typename ChangeFunc>
     std::vector<uint32_t> createClusters(BlockRange &chain, std::unordered_map<DedupAddressType::Enum, uint32_t> addressStarts, uint32_t totalScriptCount, ChangeFunc && changeHeuristic, bool ignoreCoinJoin) {
         
