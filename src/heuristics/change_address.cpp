@@ -30,7 +30,49 @@ namespace blocksci { namespace heuristics {
     bool filterOpReturn(Output o) {
         return o.getAddress().isSpendable();
     }
+
+
+
+    /** When somebody spends UTXO's that are less then N blocks old, it's probably the same entity which created this UTXO
+     *
+     * Note: This heuristic depends on the outputs being spent to detect change.
+     */
+    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::SpendingBeforeAgeN>::operator()(const Transaction &tx) const {
+        int64_t myMaxAge = maxAge;
+        return tx.outputs() | ranges::views::filter([myMaxAge](Output o){return o.isSpent() && o.getSpendingInput()->age() <= myMaxAge;}) | ranges::views::filter(filterOpReturn);
+    }
+
+
+    /** If transaction has less than N outputs, there is probably not a change. */
+    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::AtLeastNOutputs>::operator()(const Transaction &tx) const {
+        int64_t myMaxOutputs = maxOutputs;
+        if (tx.outputCount() < myMaxOutputs) {
+            return ranges::views::empty<Output>;
+        }
+        return tx.outputs() | ranges::views::filter(filterOpReturn);
+    }
+
+    /** If transaction outputs has more than N outputs, they are probably a change addresses. */
+    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::SpendingAtLeastNOutputs>::operator()(const Transaction &tx) const {
+        int64_t myMaxSpendingOutputs = maxSpendingOutputs;
+        return tx.outputs() | ranges::views::filter([myMaxSpendingOutputs](Output o){return o.isSpent() && o.getSpendingTx()->outputCount() >= myMaxSpendingOutputs;}) | ranges::views::filter(filterOpReturn);
+    }
+
+    /** If address is used in single UTXO, it's likely change address. */
+    /*  Implementation copied from python binding function:
     
+            func(method_tag, "output_txes_count", +[](AnyScript &address) -> int64_t {
+            return ranges::distance(address.getOutputTransactions());
+        }, "Return the number of transactions where this address appeared in an output");
+    */
+    template<>
+    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::OneTime>::operator()(const Transaction &tx) const {
+        
+        return tx.outputs() | ranges::views::filter([](Output o){return ranges::distance(o.getAddress().getOutputTransactions()) <= 1;}) | ranges::views::filter(filterOpReturn);
+    }
+
+
+
     /** In a peeling chain, the change output is the output that continues the chain
      *
      * Note: This heuristic depends on the outputs being spent to detect change.
