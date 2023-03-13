@@ -95,18 +95,6 @@ void init_heuristics(py::module &m) {
     .def_static("power_of_ten_value", [](int digits) { return ChangeHeuristic{PowerOfTenChange{digits}}; }, py::arg("digits") = 6,
         "Return a ChangeHeuristic object implementing the power of ten value heuristic: Detects possible change outputs by checking for output values that are multiples of 10^digits.")
     
-    .def_property_readonly_static("spending_before_6", [](pybind11::object &) { return ChangeHeuristic{SpendingBefore6{}}; },
-        "Return a ChangeHeuristic object implementing the spending before age 6 heuristic: Detects possible change outputs by checking for outputs which are spend before age of 6 blocks.")
-    
-    .def_property_readonly_static("one_time", [](pybind11::object &) { return ChangeHeuristic{OneTimeChange{}}; },
-        "Return a ChangeHeuristic object implementing the one time change heuristic: Detects possible change outputs by checking for one time changes.")
-    
-    .def_property_readonly_static("at_least_3_outputs", [](pybind11::object &) { return ChangeHeuristic{AtLeast3OutputsChange{}}; },
-        "Return a ChangeHeuristic object implementing the at least 6 outputs heuristic: Detects possible change outputs by checking if current transaction has at least 6 outputs.")
-    
-    .def_property_readonly_static("spending_at_least_3_outputs", [](pybind11::object &) { return ChangeHeuristic{SpendingAtLeast3OutputsChange{}}; },
-        "Return a ChangeHeuristic object implementing the spending at least 3 outputs heuristic: Detects possible change outputs by checking for output which are spend in txes having at least 3 outputs.")
-    
     .def_property_readonly_static("optimal_change", [](pybind11::object &) { return ChangeHeuristic{OptimalChangeChange{}}; },
         "Return a ChangeHeuristic object implementing the optimal change heuristic: If there exists an output that is smaller than any of the inputs it is likely the change. If a change output was larger than the smallest input, then the coin selection algorithm wouldn't need to add the input in the first place.")
     

@@ -89,41 +89,6 @@ namespace blocksci { namespace heuristics {
         return tx.outputs() | ranges::views::filter([](Output o){return !o.isSpent() || isPeelingChain(*o.getSpendingTx());}) | ranges::views::filter(filterOpReturn);
     }
 
-    /** When somebody spends UTXO's that are less then N blocks old, it's probably the same entity which created this UTXO
-     *
-     * Note: This heuristic depends on the outputs being spent to detect change.
-     */
-    template<>
-    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::SpendingBeforeAge6>::operator()(const Transaction &tx) const {
-        
-        return tx.outputs() | ranges::views::filter([](Output o){return o.isSpent() && o.getSpendingInput()->age() <= 6;}) | ranges::views::filter(filterOpReturn);
-    }
-
-    /** If address is used in single UTXO, it's likely change address. */
-    template<>
-    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::OneTime>::operator()(const Transaction &tx) const {
-
-        return tx.outputs() | ranges::views::filter([](Output o){return o.getAddress().getOutputTransactions().size() <= 1;}) | ranges::views::filter(filterOpReturn);
-    }
-
-    /** If transaction has less than N outputs, there is probably not a change. */
-    template<>
-    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::AtLeast3Outputs>::operator()(const Transaction &tx) const {
-        if (tx.outputCount() < 3) {
-            return ranges::views::empty<Output>;
-        }
-
-        return tx.outputs() | ranges::views::filter(filterOpReturn);
-    }
-
-    /** If transaction outputs has more than N outputs, they are probably a change addresses. */
-    template<>
-    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::SpendingAtLeast3Outputs>::operator()(const Transaction &tx) const {
-
-        return tx.outputs() | ranges::views::filter([](Output o){return o.isSpent() && o.getSpendingTx()->outputCount() >= 3;}) | ranges::views::filter(filterOpReturn);
-    }
-
-
     /** Returns 10^{digits} */
     int64_t int_pow_ten(int digits) {
         if (digits < 16) {
