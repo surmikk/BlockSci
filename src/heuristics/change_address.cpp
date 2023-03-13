@@ -58,6 +58,14 @@ namespace blocksci { namespace heuristics {
         return tx.outputs() | ranges::views::filter([myMaxSpendingOutputs](Output o){return o.isSpent() && o.getSpendingTx()->outputCount() >= myMaxSpendingOutputs;}) | ranges::views::filter(filterOpReturn);
     }
 
+    /** If address is used in single UTXO, it's likely change address. */
+    template<>
+    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::OneTime>::operator()(const Transaction &tx) const {
+
+        return tx.outputs() | ranges::views::filter([](Output o){return o.getAddress().getOutputTransactions().size() <= 1;}) | ranges::views::filter(filterOpReturn);
+    }
+
+
 
     /** In a peeling chain, the change output is the output that continues the chain
      *

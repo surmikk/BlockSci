@@ -20,8 +20,8 @@
 
 #include <unordered_set>
 
-#define CHANGE_ADDRESS_TYPE_LIST VAL(SpendingAtLeastNOutputs), VAL(AtLeastNOutputs), VAL(SpendingBeforeAgeN), VAL(PeelingChain), VAL(PowerOfTen), VAL(OptimalChange), VAL(AddressType), VAL(Locktime), VAL(AddressReuse), VAL(ClientChangeAddressBehavior), VAL(Legacy), VAL(FixedFee), VAL(None), VAL(Spent)
-#define CHANGE_ADDRESS_TYPE_SET VAL(SpendingAtLeastNOutputs), VAL(AtLeastNOutputs), VAL(SpendingBeforeAgeN), VAL(PeelingChain), VAL(PowerOfTen), VAL(OptimalChange), VAL(AddressType) VAL(Locktime), VAL(AddressReuse), VAL(ClientChangeAddressBehavior), VAL(Legacy), VAL(FixedFee), VAL(None), VAL(Spent)
+#define CHANGE_ADDRESS_TYPE_LIST VAL(OneTime), VAL(SpendingAtLeastNOutputs), VAL(AtLeastNOutputs), VAL(SpendingBeforeAgeN), VAL(PeelingChain), VAL(PowerOfTen), VAL(OptimalChange), VAL(AddressType), VAL(Locktime), VAL(AddressReuse), VAL(ClientChangeAddressBehavior), VAL(Legacy), VAL(FixedFee), VAL(None), VAL(Spent)
+#define CHANGE_ADDRESS_TYPE_SET VAL(OneTime), VAL(SpendingAtLeastNOutputs), VAL(AtLeastNOutputs), VAL(SpendingBeforeAgeN), VAL(PeelingChain), VAL(PowerOfTen), VAL(OptimalChange), VAL(AddressType) VAL(Locktime), VAL(AddressReuse), VAL(ClientChangeAddressBehavior), VAL(Legacy), VAL(FixedFee), VAL(None), VAL(Spent)
 namespace blocksci {
 namespace heuristics {
     
@@ -34,7 +34,7 @@ namespace heuristics {
         #undef VAL
         };
         #define VAL(x) Enum::x
-        static constexpr std::array<Enum, 14> all = {{CHANGE_ADDRESS_TYPE_LIST}};
+        static constexpr std::array<Enum, 15> all = {{CHANGE_ADDRESS_TYPE_LIST}};
         #undef VAL
         static constexpr size_t size = all.size();
     };
@@ -72,6 +72,7 @@ namespace heuristics {
         ranges::any_view<Output> operator()(const Transaction &tx) const;
     };
 
+    using OneTimeChange = ChangeHeuristicImpl<ChangeType::OneTime>;
     using SpendingAtLeastNOutputsChange =  ChangeHeuristicImpl<ChangeType::SpendingAtLeastNOutputs>;
     using AtLeastNOutputsChange = ChangeHeuristicImpl<ChangeType::AtLeastNOutputs>;
     using SpendingBeforeAgeNChange = ChangeHeuristicImpl<ChangeType::SpendingBeforeAgeN>;

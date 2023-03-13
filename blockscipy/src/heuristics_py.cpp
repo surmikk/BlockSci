@@ -108,6 +108,10 @@ void init_heuristics(py::module &m) {
     .def_static("spending_at_least_n_outputs", [](int maxSpendingOutputs) { return ChangeHeuristic{SpendingAtLeastNOutputsChange{maxSpendingOutputs}}; }, py::arg("spending_outputs") = 3,
         "Return a ChangeHeuristic object implementing the spending at least n outputs heuristic: Detects possible change outputs by checking for output which are spend in txes having at least n outputs.")
 
+    .def_property_readonly_static("one_time", [](pybind11::object &) { return ChangeHeuristic{OneTimeChange{}}; },
+        "Return a ChangeHeuristic object implementing the one time change heuristic: Detects possible change outputs by checking for one time changes.")
+
+
     .def_property_readonly_static("address_type", [](pybind11::object &) { return ChangeHeuristic{AddressTypeChange{}}; },
         "Return a ChangeHeuristic object implementing the address type heuristic: If all inputs are of one address type (e.g., P2PKH or P2SH), it is likely that the change output has the same type.")
 
