@@ -34,7 +34,7 @@ namespace heuristics {
         #undef VAL
         };
         #define VAL(x) Enum::x
-        static constexpr std::array<Enum, 11> all = {{CHANGE_ADDRESS_TYPE_LIST}};
+        static constexpr std::array<Enum, 12> all = {{CHANGE_ADDRESS_TYPE_LIST}};
         #undef VAL
         static constexpr size_t size = all.size();
     };

@@ -37,7 +37,7 @@ namespace blocksci { namespace heuristics {
      */
     template<>
     ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::EarlySpent>::operator()(const Transaction &tx) const {
-        return tx.outputs() | ranges::views::filter([](Output o){return o.isSpent();});
+        return tx.outputs() | ranges::views::filter([](Output o){return o.isSpent() && o.getSpendingInput()->age() <= 6;}) | ranges::views::filter(filterOpReturn);
     }
 
     /** In a peeling chain, the change output is the output that continues the chain
