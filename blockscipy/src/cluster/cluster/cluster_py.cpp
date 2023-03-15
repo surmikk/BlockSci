@@ -56,14 +56,14 @@ void init_cluster_manager(pybind11::module &s) {
     .def(py::init([](std::string arg, blocksci::Blockchain &chain) {
        return ClusterManager(arg, chain.getAccess());
     }))
-    .def_static("create_clustering", [](const std::string &location, Blockchain &chain, BlockHeight start, BlockHeight stop, heuristics::ChangeHeuristic &heuristic, bool shouldOverwrite, bool ignoreCoinJoin) {
+    .def_static("create_clustering", [](ClusterManager &clusterManager, const std::string &location, Blockchain &chain, BlockHeight start, BlockHeight stop, heuristics::ChangeHeuristic &heuristic, bool shouldOverwrite, bool ignoreCoinJoin) {
         py::scoped_ostream_redirect stream(std::cout, py::module::import("sys").attr("stdout"));
         if (stop == -1) {
             stop = chain.size();
         }
         auto range = chain[{start, stop}];
-        return ClusterManager::createClustering(range, heuristic, location, shouldOverwrite, ignoreCoinJoin);
-    }, py::arg("location"), py::arg("chain"), py::arg("start") = 0, py::arg("stop") = -1,
+        return ClusterManager::createClustering(clusterManager, range, heuristic, location, shouldOverwrite, ignoreCoinJoin);
+    }, py::arg("cluster_manager"), py::arg("location"), py::arg("chain"), py::arg("start") = 0, py::arg("stop") = -1,
     py::arg("heuristic") = heuristics::ChangeHeuristic{heuristics::NoChange{}}, py::arg("should_overwrite") = false, py::arg("ignore_coinjoin") = true)
     .def("cluster_with_address", [](const ClusterManager &cm, const Address &address) -> Cluster {
        return cm.getCluster(address);

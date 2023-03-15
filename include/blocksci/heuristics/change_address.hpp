@@ -42,28 +42,28 @@ namespace heuristics {
     
     template <ChangeType::Enum heuristic>
     struct BLOCKSCI_EXPORT ChangeHeuristicImpl {
-        ranges::any_view<Output> operator()(const Transaction &tx) const;
+        ranges::any_view<Output> operator()(ClusterManager &clusterManager, const Transaction &tx) const;
     };
     
     template<>
     struct BLOCKSCI_EXPORT ChangeHeuristicImpl<ChangeType::PowerOfTen> {
         int digits;
         ChangeHeuristicImpl(int digits_ = 6) : digits(digits_) {}
-        ranges::any_view<Output> operator()(const Transaction &tx) const;
+        ranges::any_view<Output> operator()(ClusterManager &clusterManager, const Transaction &tx) const;
     };
 
     template<>
     struct BLOCKSCI_EXPORT ChangeHeuristicImpl<ChangeType::SpendingBeforeAgeN> {
         int maxAge;
         ChangeHeuristicImpl(int maxAge_ = 6) : maxAge(maxAge_) {}
-        ranges::any_view<Output> operator()(const Transaction &tx) const;
+        ranges::any_view<Output> operator()(ClusterManager &clusterManager, const Transaction &tx) const;
     };
 
     template<>
     struct BLOCKSCI_EXPORT ChangeHeuristicImpl<ChangeType::AtLeastNOutputs> {
         int maxOutputs;
         ChangeHeuristicImpl(int maxOutputs_ = 3) : maxOutputs(maxOutputs_) {}
-        ranges::any_view<Output> operator()(const Transaction &tx) const;
+        ranges::any_view<Output> operator()(ClusterManager &clusterManager, const Transaction &tx) const;
     };
 
     template<>
@@ -90,7 +90,7 @@ namespace heuristics {
     using Spent = ChangeHeuristicImpl<ChangeType::Spent>;
     
     struct BLOCKSCI_EXPORT ChangeHeuristic {
-        using HeuristicFunc = std::function<ranges::any_view<Output>(const Transaction &tx)>;
+        using HeuristicFunc = std::function<ranges::any_view<Output>(ClusterManager &clusterManager, const Transaction &tx)>;
         
         HeuristicFunc impl;
         

@@ -37,14 +37,14 @@ namespace blocksci { namespace heuristics {
      *
      * Note: This heuristic depends on the outputs being spent to detect change.
      */
-    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::SpendingBeforeAgeN>::operator()(const Transaction &tx) const {
+    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::SpendingBeforeAgeN>::operator()(ClusterManager &clusterManager, const Transaction &tx) const {
         int64_t myMaxAge = maxAge;
         return tx.outputs() | ranges::views::filter([myMaxAge](Output o){return o.isSpent() && o.getSpendingInput()->age() <= myMaxAge;}) | ranges::views::filter(filterOpReturn);
     }
 
 
     /** If transaction has less than N outputs, there is probably not a change. */
-    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::AtLeastNOutputs>::operator()(const Transaction &tx) const {
+    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::AtLeastNOutputs>::operator()(ClusterManager &clusterManager, const Transaction &tx) const {
         int64_t myMaxOutputs = maxOutputs;
         if (tx.outputCount() < myMaxOutputs) {
             return ranges::views::empty<Output>;
@@ -53,7 +53,7 @@ namespace blocksci { namespace heuristics {
     }
 
     /** If transaction outputs has more than N outputs, they are probably a change addresses. */
-    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::SpendingAtLeastNOutputs>::operator()(const Transaction &tx) const {
+    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::SpendingAtLeastNOutputs>::operator()(ClusterManager &clusterManager, const Transaction &tx) const {
         int64_t myMaxSpendingOutputs = maxSpendingOutputs;
         return tx.outputs() | ranges::views::filter([myMaxSpendingOutputs](Output o){return o.isSpent() && o.getSpendingTx()->outputCount() >= myMaxSpendingOutputs;}) | ranges::views::filter(filterOpReturn);
     }
@@ -66,7 +66,7 @@ namespace blocksci { namespace heuristics {
         }, "Return the number of transactions where this address appeared in an output");
     */
     template<>
-    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::OneTime>::operator()(const Transaction &tx) const {
+    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::OneTime>::operator()(ClusterManager &clusterManager, const Transaction &tx) const {
         
         return tx.outputs() | ranges::views::filter([](Output o){return o.isSpent() && o.getSpendingTx()->inputCount() <=1 && ranges::distance(o.getAddress().getOutputTransactions()) <= 1;}) | ranges::views::filter(filterOpReturn);
     }
@@ -79,7 +79,7 @@ namespace blocksci { namespace heuristics {
      * If an output has not been spent, it is considered a potential change output.
      */
     template<>
-    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::PeelingChain>::operator()(const Transaction &tx) const {
+    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::PeelingChain>::operator()(ClusterManager &clusterManager, const Transaction &tx) const {
         // If current tx is not a peeling chain, return an empty set
         if (!isPeelingChain(tx)) {
             return ranges::views::empty<Output>;
@@ -108,7 +108,7 @@ namespace blocksci { namespace heuristics {
      * On the other hand, it is extremely unlikely that you receive power of ten change due to a wallet's coin selection.
      * Default for digits is 6 (i.e. it selects outputs with a value that is a multiple of 0.01 BTC)
      */
-    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::PowerOfTen>::operator()(const Transaction &tx) const {
+    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::PowerOfTen>::operator()(ClusterManager &clusterManager, const Transaction &tx) const {
         int64_t value = int_pow_ten(digits);
         return tx.outputs() | ranges::views::filter([value](Output o){return o.getValue() % value != 0;}) | ranges::views::filter(filterOpReturn);
     }
@@ -120,7 +120,7 @@ namespace blocksci { namespace heuristics {
      * wouldn't need to add the input in the first place.
      */
     template<>
-    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::OptimalChange>::operator()(const Transaction &tx) const {
+    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::OptimalChange>::operator()(ClusterManager &clusterManager, const Transaction &tx) const {
         auto smallestInputValue = tx.inputs()[0].getValue();
         RANGES_FOR(auto input, tx.inputs()) {
             smallestInputValue = std::min(smallestInputValue, input.getValue());
@@ -130,7 +130,7 @@ namespace blocksci { namespace heuristics {
     
     /** If all inputs are of one address type (e.g., P2PKH or P2SH), it is likely that the change output has the same type. */
     template<>
-    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::AddressType>::operator()(const Transaction &tx) const {
+    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::AddressType>::operator()(ClusterManager &clusterManager, const Transaction &tx) const {
         // check whether all inputs have the same type (e.g., P2SH)
         bool allInputsSameType = true;
         AddressType::Enum inputType = tx.inputs()[0].getType();
@@ -157,14 +157,14 @@ namespace blocksci { namespace heuristics {
      * If an output has not been spent, it is considered a potential change output.
      */
     template<>
-    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::Locktime>::operator()(const Transaction &tx) const {
+    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::Locktime>::operator()(ClusterManager &clusterManager, const Transaction &tx) const {
         bool locktimeGreaterZero = tx.locktime() > 0;
         return tx.outputs() | ranges::views::filter([locktimeGreaterZero](Output o){return !o.isSpent() || (o.getSpendingTx().value().locktime() > 0) == locktimeGreaterZero;}) | ranges::views::filter(filterOpReturn);
     }
 
     /** If input addresses appear as an output address, the client might have reused addresses for change. */
     template<>
-    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::AddressReuse>::operator()(const Transaction &tx) const {
+    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::AddressReuse>::operator()(ClusterManager &clusterManager, const Transaction &tx) const {
         std::unordered_set<Address> inputAddresses;
         RANGES_FOR(auto input, tx.inputs()) {
             inputAddresses.insert(input.getAddress());
@@ -178,7 +178,7 @@ namespace blocksci { namespace heuristics {
      * If an output is the first to send value to an address, it is potentially the change.
      */
     template<>
-    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::ClientChangeAddressBehavior>::operator()(const Transaction &tx) const {
+    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::ClientChangeAddressBehavior>::operator()(ClusterManager &clusterManager, const Transaction &tx) const {
         return tx.outputs() | ranges::views::filter([tx](Output o){return o.getAddress().isSpendable() && o.getAddress().getBaseScript().getFirstTxIndex() == tx.txNum;}) | ranges::views::filter(filterOpReturn);
     }
     
@@ -216,7 +216,7 @@ namespace blocksci { namespace heuristics {
     // This function mostly exists to ensure a consistent API.
     // The set it returns will never contain more than one output.
     template<>
-    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::Legacy>::operator()(const Transaction &tx) const {
+    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::Legacy>::operator()(ClusterManager &clusterManager, const Transaction &tx) const {
         auto c = uniqueChangeByLegacyHeuristic(tx);
         if (c.has_value()) {
             return ranges::views::single(c.value());
@@ -226,14 +226,14 @@ namespace blocksci { namespace heuristics {
 
     /** Clients may choose a fixed fee per kb instead of using one based on the current fee market. */
     template<>
-    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::FixedFee>::operator()(const Transaction &tx) const {
+    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::FixedFee>::operator()(ClusterManager &clusterManager, const Transaction &tx) const {
         auto fee = tx.fee() * 1000 / tx.virtualSize();
         return tx.outputs() | ranges::views::filter([fee](Output o) {return !o.isSpent() || (o.getSpendingTx()->fee() * 1000 / o.getSpendingTx()->virtualSize()) == fee;}) | ranges::views::filter(filterOpReturn);
     }
     
     /** Disables change address clustering by returning an empty set. */
     template<>
-    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::None>::operator()(const Transaction &) const {
+    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::None>::operator()(ClusterManager &clusterManager, const Transaction &) const {
         return ranges::views::empty<Output>;
     }
     
@@ -242,7 +242,7 @@ namespace blocksci { namespace heuristics {
      * This is useful in combination with change address heuristics that return unspent outputs as candidates.
      */
     template<>
-    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::Spent>::operator()(const Transaction &tx) const {
+    ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::Spent>::operator()(ClusterManager &clusterManager, const Transaction &tx) const {
         return tx.outputs() | ranges::views::filter([](Output o){return o.isSpent();});
     }
 }  // namespace heuristics
