@@ -12,6 +12,7 @@
 #include <blocksci/chain/transaction.hpp>
 #include <blocksci/chain/input.hpp>
 #include <blocksci/scripts/script_variant.hpp>
+#include <blocksci/cluster/cluster_manager.hpp>
 
 #include <range/v3/range_for.hpp>
 #include <range/v3/view/filter.hpp>
