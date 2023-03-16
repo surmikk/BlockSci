@@ -71,7 +71,7 @@ namespace heuristics {
     struct BLOCKSCI_EXPORT ChangeHeuristicImpl<ChangeType::SpendingAtLeastNOutputs> {
         int maxSpendingOutputs;
         ChangeHeuristicImpl(int maxSpendingOutputs_ = 3) : maxSpendingOutputs(maxSpendingOutputs_) {}
-        ranges::any_view<Output> operator()(const Transaction &tx) const;
+        ranges::any_view<Output> operator()(ClusterManager &clusterManager, const Transaction &tx) const;
     };
 
     using OneTimeChange = ChangeHeuristicImpl<ChangeType::OneTime>;
@@ -100,13 +100,13 @@ namespace heuristics {
         template<typename T>
         ChangeHeuristic(T func) : impl(std::move(func)) {}
         
-        ranges::any_view<Output> operator()(const Transaction &tx) const {
-            return impl(tx);
+        ranges::any_view<Output> operator()(ClusterManager &clusterManager, const Transaction &tx) const {
+            return impl(clusterManager, tx);
         }
         
         static ChangeHeuristic uniqueChange(ChangeHeuristic ch) {
-            return ChangeHeuristic{HeuristicFunc{[=](const Transaction &tx) {
-                auto c = ch(tx);
+            return ChangeHeuristic{HeuristicFunc{[=](ClusterManager &clusterManager, const Transaction &tx) {
+                auto c = ch(clusterManager, tx);
                 if (ranges::distance(c) == 1) {
                     return c;
                 } else {
@@ -117,25 +117,25 @@ namespace heuristics {
         }
         
         static ChangeHeuristic setIntersection(ChangeHeuristic a, ChangeHeuristic b) {
-            return ChangeHeuristic{HeuristicFunc{[=](const Transaction &tx) {
-                auto first = a(tx);
-                auto second = b(tx);
+            return ChangeHeuristic{HeuristicFunc{[=](ClusterManager &clusterManager, const Transaction &tx) {
+                auto first = a(clusterManager, tx);
+                auto second = b(clusterManager, tx);
                 return ranges::views::set_intersection(first, second);
             }}};
         }
         
         static ChangeHeuristic setUnion(ChangeHeuristic a, ChangeHeuristic b) {
-            return ChangeHeuristic{HeuristicFunc{[=](const Transaction &tx) {
-                auto first = a(tx);
-                auto second = b(tx);
+            return ChangeHeuristic{HeuristicFunc{[=](ClusterManager &clusterManager, const Transaction &tx) {
+                auto first = a(clusterManager, tx);
+                auto second = b(clusterManager, tx);
                 return ranges::views::set_union(first, second);
             }}};
         }
         
         static ChangeHeuristic setDifference(ChangeHeuristic a, ChangeHeuristic b) {
-            return ChangeHeuristic{HeuristicFunc{[=](const Transaction &tx) {
-                auto first = a(tx);
-                auto second = b(tx);
+            return ChangeHeuristic{HeuristicFunc{[=](ClusterManager &clusterManager, const Transaction &tx) {
+                auto first = a(clusterManager, tx);
+                auto second = b(clusterManager, tx);
                 return ranges::views::set_difference(first, second);
             }}};
         }
