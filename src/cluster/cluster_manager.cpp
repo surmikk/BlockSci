@@ -364,8 +364,8 @@ namespace blocksci {
     
     ClusterManager ClusterManager::createClustering(ClusterManager &clusterManager, BlockRange &chain, const heuristics::ChangeHeuristic &changeHeuristic, const std::string &outputPath, bool overwrite, bool ignoreCoinJoin) {
         
-        auto changeHeuristicL = [&changeHeuristic](const Transaction &tx) -> ranges::any_view<Output> {
-            return changeHeuristic(tx);
+        auto changeHeuristicL = [&changeHeuristic](ClusterManager &clusterManager, const Transaction &tx) -> ranges::any_view<Output> {
+            return changeHeuristic(clusterManager, tx);
         };
         
         return createClusteringImpl(clusterManager, chain, changeHeuristicL, outputPath, overwrite, ignoreCoinJoin);
