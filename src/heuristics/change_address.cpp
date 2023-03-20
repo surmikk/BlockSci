@@ -67,8 +67,9 @@ namespace blocksci { namespace heuristics {
     */
     template<>
     ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::OneTime>::operator()(const Transaction &tx) const {
-        
-        return tx.outputs() | ranges::views::filter([](Output o){return o.isSpent() && o.getSpendingTx()->inputCount() <=1 && ranges::distance(o.getAddress().getOutputTransactions()) <= 1;}) | ranges::views::filter(filterOpReturn);
+        int64_t myMaxAge = maxAge;
+
+        return tx.outputs() | ranges::views::filter([](Output o){return o.isSpent() && o.getSpendingTx()->inputCount() <=1 && o.getSpendingInput()->age() <= myMaxAge && ranges::distance(o.getAddress().getOutputTransactions()) <= 1;}) | ranges::views::filter(filterOpReturn);
     }
 
 
