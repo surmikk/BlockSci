@@ -34,7 +34,7 @@ namespace blocksci {
         ~ClusterManager();
         
         static ClusterManager createClustering(ClusterManager &clusterManager, BlockRange &chain, const heuristics::ChangeHeuristic &heuristic, const std::string &outputPath, bool overwrite = false, bool ignoreCoinJoin = false);
-        static ClusterManager createClustering(ClusterManager &clusterManager, BlockRange &chain, const std::function<ranges::any_view<Output>(const Transaction &tx)> &changeHeuristic, const std::string &outputPath, bool overwrite, bool ignoreCoinJoin);
+        static ClusterManager createClustering(ClusterManager &clusterManager, BlockRange &chain, const std::function<ranges::any_view<Output>(ClusterManager &clusterManager, const Transaction &tx)> &changeHeuristic, const std::string &outputPath, bool overwrite, bool ignoreCoinJoin);
         
         Cluster getCluster(const Address &address) const;
         

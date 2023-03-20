@@ -371,7 +371,7 @@ namespace blocksci {
         return createClusteringImpl(clusterManager, chain, changeHeuristicL, outputPath, overwrite, ignoreCoinJoin);
     }
     
-    ClusterManager ClusterManager::createClustering(ClusterManager &clusterManager, BlockRange &chain, const std::function<ranges::any_view<Output>(const Transaction &tx)> &changeHeuristic, const std::string &outputPath, bool overwrite, bool ignoreCoinJoin) {
+    ClusterManager ClusterManager::createClustering(ClusterManager &clusterManager, BlockRange &chain, const std::function<ranges::any_view<Output>(ClusterManager &clusterManager, const Transaction &tx)> &changeHeuristic, const std::string &outputPath, bool overwrite, bool ignoreCoinJoin) {
         return createClusteringImpl(clusterManager, chain, changeHeuristic, outputPath, overwrite, ignoreCoinJoin);
     }
 } // namespace blocksci
