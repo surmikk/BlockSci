@@ -76,7 +76,7 @@ namespace heuristics {
     template<>
     struct BLOCKSCI_EXPORT ChangeHeuristicImpl<ChangeType::OneTime> {
         int maxAgeOneTime;
-        ChangeHeuristicImpl(int maxAgeOneTime_ = 6) : maxAge(maxAgeOneTime_) {}
+        ChangeHeuristicImpl(int maxAgeOneTime_ = 6) : maxAgeOneTime(maxAgeOneTime_) {}
         ranges::any_view<Output> operator()(const Transaction &tx) const;
     };
 
