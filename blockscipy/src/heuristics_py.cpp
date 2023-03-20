@@ -70,8 +70,8 @@ void init_heuristics(py::module &m) {
 
     py::class_<ChangeHeuristic>(s2, "ChangeHeuristic", "Class representing a change heuristic")
     .def(py::init([](Proxy<ranges::any_view<Output>> &heuristic) {
-        std::function<ranges::any_view<Output>(const Transaction &tx)> changeFunc = [heuristic](const Transaction &tx) {
-            return heuristic(tx);
+        std::function<ranges::any_view<Output>(ClusterManager &clusterManager, const Transaction &tx)> changeFunc = [heuristic](ClusterManager &clusterManager, const Transaction &tx) {
+            return heuristic(clusterManager, tx);
         };
         return ChangeHeuristic(changeFunc);
     }))
@@ -79,8 +79,8 @@ void init_heuristics(py::module &m) {
     .def("__or__", &ChangeHeuristic::setUnion, py::arg("other_heuristic"), "Return a new heuristic matching outputs that match either of the given heuristics")
     .def("__sub__", &ChangeHeuristic::setDifference, py::arg("other_heuristic"), "Return a new heuristic matching outputs matched by the first heuristic unless they're matched by the second heuristic")
     .def_property_readonly("__call__", [](ChangeHeuristic &ch) -> Proxy<ranges::any_view<Output>> {
-        return lift(makeSimpleProxy<Transaction>(), [ch](const Transaction &tx) {
-            return ch(tx);
+        return lift(makeSimpleProxy<Transaction>(), [ch](ClusterManager &clusterManager, const Transaction &tx) {
+            return ch(clusterManager, tx);
         });
     }, "Return all outputs matching the change heuristic")
     .def_property_readonly("unique_change", &ChangeHeuristic::uniqueChange, "Return a new heuristic that will return a single output if it's the only candidate output, and no outputs otherwise.");
