@@ -65,7 +65,6 @@ namespace blocksci { namespace heuristics {
             return ranges::distance(address.getOutputTransactions());
         }, "Return the number of transactions where this address appeared in an output");
     */
-    template<>
     ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::OneTime>::operator()(const Transaction &tx) const {
         int64_t myMaxAge = maxAge;
 
