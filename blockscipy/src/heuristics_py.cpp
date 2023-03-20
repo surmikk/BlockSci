@@ -108,7 +108,7 @@ void init_heuristics(py::module &m) {
     .def_static("spending_at_least_n_outputs", [](int maxSpendingOutputs) { return ChangeHeuristic{SpendingAtLeastNOutputsChange{maxSpendingOutputs}}; }, py::arg("spending_outputs") = 3,
         "Return a ChangeHeuristic object implementing the spending at least n outputs heuristic: Detects possible change outputs by checking for output which are spend in txes having at least n outputs.")
 
-    .def_static("one_time", [](int maxAgeOneTime) { return ChangeHeuristic{OneTimeChange{}}; }, py::arg("max_age") = 6,
+    .def_static("one_time", [](int maxAgeOneTime) { return ChangeHeuristic{OneTimeChange{maxAgeOneTime}}; }, py::arg("max_age") = 6,
         "Return a ChangeHeuristic object implementing the one time change heuristic: Detects possible change outputs by checking for one time changes.")
 
 
