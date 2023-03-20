@@ -66,9 +66,9 @@ namespace blocksci { namespace heuristics {
         }, "Return the number of transactions where this address appeared in an output");
     */
     ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::OneTime>::operator()(const Transaction &tx) const {
-        int64_t myMaxAge = maxAge;
+        int64_t mymaxAgeOneTime = maxAgeOneTime;
 
-        return tx.outputs() | ranges::views::filter([](Output o){return o.isSpent() && o.getSpendingTx()->inputCount() <=1 && o.getSpendingInput()->age() <= myMaxAge && ranges::distance(o.getAddress().getOutputTransactions()) <= 1;}) | ranges::views::filter(filterOpReturn);
+        return tx.outputs() | ranges::views::filter([](Output o){return o.isSpent() && o.getSpendingTx()->inputCount() <=1 && o.getSpendingInput()->age() <= mymaxAgeOneTime && ranges::distance(o.getAddress().getOutputTransactions()) <= 1;}) | ranges::views::filter(filterOpReturn);
     }
 
 
