@@ -78,8 +78,9 @@ void init_heuristics(py::module &m) {
     .def("__and__", &ChangeHeuristic::setIntersection, py::arg("other_heuristic"), "Return a new heuristic matching outputs that match both of the given heuristics")
     .def("__or__", &ChangeHeuristic::setUnion, py::arg("other_heuristic"), "Return a new heuristic matching outputs that match either of the given heuristics")
     .def("__sub__", &ChangeHeuristic::setDifference, py::arg("other_heuristic"), "Return a new heuristic matching outputs matched by the first heuristic unless they're matched by the second heuristic")
+    // TODO not sure if there could be brackets inside makeSimpleProxy<...>
     .def_property_readonly("__call__", [](ChangeHeuristic &ch) -> Proxy<ranges::any_view<Output>> {
-        return lift(makeSimpleProxy<Transaction>(), [ch](ClusterManager &clusterManager, const Transaction &tx) {
+        return lift(makeSimpleProxy<(ClusterManager, Transaction)>(), [ch](ClusterManager &clusterManager, const Transaction &tx) {
             return ch(clusterManager, tx);
         });
     }, "Return all outputs matching the change heuristic")
