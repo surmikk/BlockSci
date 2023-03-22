@@ -123,7 +123,8 @@ public:
         bool isFirstSpend = data->txFirstSpent == std::numeric_limits<uint32_t>::max();
 
         /** Can occur when a wrapped input is serialized before the top-level input */
-        bool isNewerFirstSpend = txNum < data->txFirstSpent;
+        // HERE changed the condition
+        bool isNewerFirstSpend = isFirstSpend || txNum >= data->txFirstSpent;
 
         /** Default value of ScriptDataBase.txFirstSeen is the txNum of the transaction that contained the script */
         bool isNewerFirstSeen = outputTxNum < data->txFirstSeen;
