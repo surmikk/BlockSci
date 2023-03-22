@@ -69,7 +69,8 @@ namespace blocksci { namespace heuristics {
     template<>
     ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::OneTime>::operator()(ClusterManager &clusterManager, const Transaction &tx) const {
         
-        return tx.outputs() | ranges::views::filter([](Output o){return o.isSpent() && o.getSpendingTx()->inputCount() <=1 && ranges::distance(o.getAddress().getOutputTransactions()) <= 1;}) | ranges::views::filter(filterOpReturn);
+        return tx.outputs() | ranges::views::filter([tx, clusterManager](Output o){return o.isSpent() && o.getSpendingTx()->inputCount() <=1 && o.getAddress().getBaseScript().getFirstTxIndex() == tx.txNum
+        &&  clusterManager.getCluster(o.getAddress()).getTypeEquivSize() <= 1;}) | ranges::views::filter(filterOpReturn);
     }
 
 
