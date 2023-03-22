@@ -34,6 +34,10 @@ namespace blocksci {
         uint32_t getFirstTxIndex() const {
             return rawData->txFirstSeen;
         }
+
+        uint32_t getLastTxSpent() const {
+            return rawData->txFirstSpent;
+        }
         
         ranges::optional<uint32_t> getTxRevealedIndex() const {
             auto txRevealedIndex = rawData->txFirstSpent;

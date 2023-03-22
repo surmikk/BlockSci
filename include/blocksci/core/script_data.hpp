@@ -80,6 +80,10 @@ namespace blocksci {
             return txFirstSeen;
         }
         
+        uint32_t getLastTxSpent() const {
+            return txFirstSpent;
+        }
+
         bool hasBeenSpent() const {
             return txFirstSpent != std::numeric_limits<uint32_t>::max();
         }
