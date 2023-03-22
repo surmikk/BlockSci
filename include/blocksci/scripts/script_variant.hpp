@@ -79,6 +79,10 @@ namespace blocksci {
         uint32_t firstTxIndex() {
             return mpark::visit([&](auto &scriptAddress) { return scriptAddress.getFirstTxIndex(); }, wrapped);
         }
+
+        uint32_t lastTxSpentIndex() {
+            return mpark::visit([&](auto &scriptAddress) { return scriptAddress.getLastTxSpent(); }, wrapped);
+        }
         
         ranges::optional<uint32_t> txRevealedIndex() {
             return mpark::visit([&](auto &scriptAddress) { return scriptAddress.getTxRevealedIndex(); }, wrapped);
