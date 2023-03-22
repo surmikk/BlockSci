@@ -59,16 +59,15 @@ namespace blocksci { namespace heuristics {
     }
 
     /** If address is used in single UTXO, it's likely change address. */
-    /*  Implementation copied from python binding function:
-    
-            func(method_tag, "output_txes_count", +[](AnyScript &address) -> int64_t {
-            return ranges::distance(address.getOutputTransactions());
-        }, "Return the number of transactions where this address appeared in an output");
+    /*  
+        Comparing first and last transaction occurance
     */
     template<>
     ranges::any_view<Output> ChangeHeuristicImpl<ChangeType::OneTime>::operator()(const Transaction &tx) const {
         
-        return tx.outputs() | ranges::views::filter([](Output o){return o.isSpent() && o.getSpendingTx()->inputCount() <=1 && ranges::distance(o.getAddress().getOutputTransactions()) <= 1;}) | ranges::views::filter(filterOpReturn);
+        return tx.outputs() | ranges::views::filter([tx](Output o){return o.isSpent() && o.getSpendingTx()->inputCount() <=1 
+        && o.getAddress().getBaseScript().getFirstTxIndex() == tx.txNum 
+        && o.getAddress().getBaseScript().getLastTxSpent() == o.getSpendingInput()->transaction().txNum;}) | ranges::views::filter(filterOpReturn);
     }
 
 
