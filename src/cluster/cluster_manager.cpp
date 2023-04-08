@@ -356,7 +356,7 @@ namespace blocksci {
             }
         }
         
-        auto parent = createClusters(chain, scriptStarts, static_cast<uint32_t>(totalScriptCount), std::forward<ChangeFunc>(changeHeuristic), false);
+        auto parent = createClusters(chain, scriptStarts, static_cast<uint32_t>(totalScriptCount), std::forward<ChangeFunc>(changeHeuristic), ignoreCoinJoin);
         uint32_t clusterCount = remapClusterIds(parent);
         serializeClusterData(scripts, outputPath, parent, scriptStarts, clusterCount);
         return {filesystem::path{outputPath}.str(), chain.getAccess()};
